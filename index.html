@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <title>Product-catalog</title>
+</head>
+
+<body>
+    <div class="container">
+        <nav class="navbar navbar-dark bg-dark d-flex">
+            <h1 class="navbar-brand m-auto">Product catalog</h1>
+            <input type="text" name="filter" class="form-control m-3" id="filter" placeholder="filter your product..." />
+        </nav>
+        <div class="card card-body">
+            <ul class="list-group collection">
+
+                <!-- <li class="list-group-item collection-item">
+                    <strong>Sneakers</strong>- <span class="price">$30</span>
+                    <i class="fa fa-trash float-right"></i>
+                </li>
+                <li class="list-group-item collection-item">
+                    <strong>Towel</strong>- <span class="price">$30</span>
+                    <i class="fa fa-trash float-right"></i>
+                </li> -->
+            </ul>
+            <span class="msg"></span>
+            <form onkeydown="return event.key != 'Enter';">
+                <div class="row mt-4">
+                    <div class="col">
+                        <input type="text" placeholder="product name" class="form-control product-name">
+                    </div>
+                    <div class="col">
+                        <input type="text" placeholder="product price" class="form-control product-price">
+                    </div>
+                </div>
+                <button class="btn mt-3 btn-block btn-primary add-product">Submit</button>
+            </form>
+
+        </div>
+        <script src="./assets/js/main.js"></script>
+</body>
+
+</html>
