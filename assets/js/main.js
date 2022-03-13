@@ -27,7 +27,14 @@ D - DELETE  -> ( removing info )
 * * যখন কোন একটা আইটেম কে ইডিট অথবা আপডেট করব তখন একটা সিংগল আইটেম নিয়ে ডিল করতে হবে মানে আইডেনটিফাই করতে হবে। 
 
 */
+/**
+//memory (temporary)
+// database 
+// localStorage, sessionStorage 
 
+
+ */
+;
 (function() {
     const fromElm = document.querySelector('form');
     const nameInputElm = document.querySelector('.product-name');
@@ -39,9 +46,9 @@ D - DELETE  -> ( removing info )
     let products = [];
 
 
-    function showAllItemToUI(filterArr) {
+    function showAllItemsToUI(items) {
         listGroupElm.innerHTML = '';
-        filterArr.forEach(item => {
+        items.forEach(item => {
             // Generate id
             // const id = ;
             const listElm = `<li class="list-group-item item-${item.id} collection-item">
@@ -52,12 +59,13 @@ D - DELETE  -> ( removing info )
         });
     }
 
-
+    function updateAfterRemove(products, id) {
+        return products.filter(product => product.id !== id);
+    }
 
     function revoveItemFromDataStore(id) {
-        const productsAfterDelete = products.filter(product => product.id !== id);
+        const productsAfterDelete = updateAfterRemove(products, id);
         products = productsAfterDelete;
-
     }
 
     function removeItemFormUI(id) {
@@ -79,7 +87,9 @@ D - DELETE  -> ( removing info )
         // const id = ;
         const listElm = `<li class="list-group-item item-${id} collection-item">
         <strong>${name}</strong>- <span class="price">$${price}</span>
-        <i class="fa fa-trash delete-item float-right"></i></li>`
+        <i class="fa fa-trash delete-item float-right"></i>
+        <i class="fa fa-pencil-alt edit-item float-right"></i>
+        </li>`
         listGroupElm.insertAdjacentHTML("afterbegin", listElm)
     }
 
@@ -90,9 +100,9 @@ D - DELETE  -> ( removing info )
             isError = true;
             // console.log('Invalid name input');
         };
-        if (!price || Number(price) <= 0) {
+        console.log(price, typeof price)
+        if (!price || isNaN(price) || Number(price) <= 0) {
             isError = true;
-            // console.log('Invalid price input');
         }
 
         return isError;
@@ -106,6 +116,31 @@ D - DELETE  -> ( removing info )
             nameInput,
             priceInput,
         }
+    }
+
+    function addItemToStorage(product) {
+        let products;
+        if (localStorage.getItem('storeProducts')) {
+            products = JSON.parse(localStorage.getItem('storeProducts'));
+
+            products.push(product);
+            //update to localStorage
+            localStorage.setItem('storeProducts', JSON.stringify(products));
+        } else {
+            products = [];
+            products.push(product);
+            //update to localStor
+            localStorage.setItem('storeProducts', JSON.stringify(products));
+        }
+    }
+
+    function removeProductFromStorage(id) {
+        //pick from localStorage
+        const productsAterRemove = JSON.parse(localStorage.getItem('storeProducts'));
+        // filter
+        const produtsAfterRemove = updateAfterRemove(products, id);
+        //save data to local storage
+        localStorage.setItem('storeProducts', JSON.stringify(produtsAfterRemove));
     }
 
     function init() {
@@ -123,19 +158,20 @@ D - DELETE  -> ( removing info )
                 return;
             }
 
-            //Add item to data store
             //generate item 
             const id = products.length;
-
-            products.push({
+            const product = {
                     id: id,
                     name: nameInput,
                     price: priceInput,
-                })
-                //Add item to the UI
+                }
+                //Add item to data store
+            products.push(product);
+            //Add item to the UI
             addItemToUI(id, nameInput, priceInput);
+            // Add item to localstorage
 
-            console.log(products);
+            addItemToStorage(product);
             //rest the input
             resetInput();
 
@@ -147,7 +183,7 @@ D - DELETE  -> ( removing info )
             const filterArr = products.filter((product) => product.name.includes(filterValue));
 
             //show Item to UI
-            showAllItemToUI(filterArr);
+            showAllItemsToUI(filterArr);
         });
 
         //Deletin item (event delegation)
@@ -157,12 +193,56 @@ D - DELETE  -> ( removing info )
                 const id = getItemID(evt.target);
                 //delete item from UI
                 removeItemFormUI(id);
+                //delete item from data stores
                 revoveItemFromDataStore(id);
-                //delete item
+                // delete item from storage
+                removeProductFromStorage(id);
+            } else if (evt.target.classList.contains('edit-item')) {
+                //Pick the item id
+                const id = getItemID(evt.target);
+                //find the item 
+                const foundProduct = products.find(product => product.id === id);
+                console.log(foundProduct);
+
+                //populate the item data to UI
+                //show updated button
+                //updating the data(from user)
+                //updated data should be updated to UI
+                //updated data should be updated to data store
+                //updated data should be updated to LocalStorage
             }
         });
-
+        document.addEventListener('DOMContentLoaded', e => {
+            //checking item into localStorage
+            if (localStorage.getItem('storeProducts')) {
+                const products = JSON.parse(localStorage.getItem('storeProducts'))
+                    // console.log(products);
+                showAllItemsToUI(products);
+            }
+        })
     }
 
+
+
     init();
+
 })()
+
+//LocalStorage => All premitive type data store hoi.
+
+// const data = 30;
+
+// localStorage.setItem('Key', data);
+// console.log(localStorage.setItem('Key'));
+
+
+//Complex Data type
+
+// const data = [{
+//     name: 'obydul',
+// }, {
+//     neme: 'islam',
+// }]
+
+// localStorage.setItem('valu', JSON.stringify(data));
+// console.log(JSON.parse(localStorage.setItem('valu')));
