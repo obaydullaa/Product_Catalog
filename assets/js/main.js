@@ -29,8 +29,8 @@ D - DELETE  -> ( removing info )
 */
 /**
 //memory (temporary)
-// database 
-// localStorage, sessionStorage 
+// database
+// localStorage, sessionStorage
 
 
  */
@@ -41,6 +41,7 @@ D - DELETE  -> ( removing info )
     const priceInputElm = document.querySelector('.product-price');
     const listGroupElm = document.querySelector('.list-group');
     const filterElm = document.querySelector('#filter');
+    const addProductElm = document.querySelector('.add-product');
 
     // traking item
     let products = [];
@@ -53,7 +54,10 @@ D - DELETE  -> ( removing info )
             // const id = ;
             const listElm = `<li class="list-group-item item-${item.id} collection-item">
         <strong>${item.name}</strong>- <span class="price">$${item.price}</span>
-        <i class="fa fa-trash delete-item float-right"></i></li>`;
+        <i class="fa fa-trash delete-item float-right"></i>
+        <i class="fa fa-pencil-alt edit-item float-right"></i>
+        </li>`
+
 
             listGroupElm.insertAdjacentHTML("afterbegin", listElm);
         });
@@ -84,7 +88,6 @@ D - DELETE  -> ( removing info )
 
     function addItemToUI(id, name, price) {
         // Generate id
-        // const id = ;
         const listElm = `<li class="list-group-item item-${id} collection-item">
         <strong>${name}</strong>- <span class="price">$${price}</span>
         <i class="fa fa-trash delete-item float-right"></i>
@@ -100,7 +103,6 @@ D - DELETE  -> ( removing info )
             isError = true;
             // console.log('Invalid name input');
         };
-        console.log(price, typeof price)
         if (!price || isNaN(price) || Number(price) <= 0) {
             isError = true;
         }
@@ -143,7 +145,26 @@ D - DELETE  -> ( removing info )
         localStorage.setItem('storeProducts', JSON.stringify(produtsAfterRemove));
     }
 
+    function populateUIInEditState(product) {
+        nameInputElm.value = product.name;
+        priceInputElm.value = product.price;
+    }
+
+    function showUpdatBtn() {
+        const elm = `<button type="button" class="btn mt-3 btn-block btn-secondary update-product">Update</button>`
+            //hide submit btn
+        addProductElm.style.display = 'none';
+        fromElm.insertAdjacentHTML('beforeend', elm);
+    }
+
+    function updateProductsToStorage() {
+        if (localStorage.getItem('storeProducts')) {
+            localStorage.setItem('storeProducts', JSON.stringify(products))
+        }
+    }
+
     function init() {
+        let updatedItemId;
         fromElm.addEventListener('submit', (evt) => {
             // prevent default action(borwser reloading) 
             evt.preventDefault();
@@ -153,6 +174,7 @@ D - DELETE  -> ( removing info )
 
             //validate input
             const isError = validateInput(nameInput, priceInput);
+
             if (isError) {
                 alert('Please provide valid input');
                 return;
@@ -199,25 +221,71 @@ D - DELETE  -> ( removing info )
                 removeProductFromStorage(id);
             } else if (evt.target.classList.contains('edit-item')) {
                 //Pick the item id
-                const id = getItemID(evt.target);
+                updatedItemId = getItemID(evt.target);
                 //find the item 
-                const foundProduct = products.find(product => product.id === id);
+                const foundProduct = products.find(product => product.id === updatedItemId);
                 console.log(foundProduct);
 
                 //populate the item data to UI
+                populateUIInEditState(foundProduct);
                 //show updated button
+                if (!document.querySelector('.update-product')) {
+                    showUpdatBtn()
+                }
                 //updating the data(from user)
-                //updated data should be updated to UI
                 //updated data should be updated to data store
+                //updated data should be updated to UI
                 //updated data should be updated to LocalStorage
             }
         });
+
+        fromElm.addEventListener('click', (evt) => {
+            if (evt.target.classList.contains('update-product')) {
+                //pick the data from the field
+                const { nameInput, priceInput } = reciveInputs();
+                //validat the input
+                const isError = validateInput(nameInput, priceInput);
+
+                if (isError) {
+                    alert('Please provide valid input update-product');
+                    return;
+                }
+                //updated data should be updated to data store
+                products = products.map((product) => {
+                        if (product.id === updatedItemId) {
+                            // item should be updated
+                            return {
+                                id: product.id,
+                                name: nameInput,
+                                price: priceInput
+                            }
+                        } else {
+                            //No update
+                            return product;
+                        }
+                    })
+                    //reset input
+                resetInput()
+                    //show submit button
+                addProductElm.style.display = 'block';
+                //hide update button
+
+                //updated data should be updated to UI 
+                showAllItemsToUI(products);
+                document.querySelector('.update-product').remove();
+                //updated data should be updated to LocalStorage
+                updateProductsToStorage()
+            }
+        })
+
         document.addEventListener('DOMContentLoaded', e => {
             //checking item into localStorage
             if (localStorage.getItem('storeProducts')) {
-                const products = JSON.parse(localStorage.getItem('storeProducts'))
-                    // console.log(products);
+                products = JSON.parse(localStorage.getItem('storeProducts'))
+
+                //Show items to UI
                 showAllItemsToUI(products);
+                //populate tmporary data store
             }
         })
     }
@@ -245,4 +313,5 @@ D - DELETE  -> ( removing info )
 // }]
 
 // localStorage.setItem('valu', JSON.stringify(data));
+// console.log(JSON.parse(localStorage.setItem('valu')));
 // console.log(JSON.parse(localStorage.setItem('valu')));
